@@ -1,0 +1,6 @@
+plugin:
+    name: 'Fortify Input Sanitizer'
+    description: 'wobqqq.fortify::lang.messages.fortify_description'
+    author: wobqqq
+    icon: icon-shield
+    homepage: 'https://github.com/wobqqq/oc-fortify-plugin'
