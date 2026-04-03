@@ -25,7 +25,11 @@ final readonly class FortifyListener
     ) {
     }
 
-    public function subscribe(Dispatcher $event): void
+    /**
+     * @param Dispatcher $event
+     * @return void
+     */
+    public function subscribe($event): void
     {
         $event->listen(FortifyEvent::SERVICES_WIDGET_GROUP_ITEM_INPUT_SANITIZER->value, function (WidgetGroupItemDto &$widgetGroupItemDto) {
             $this->serveWidgetGroupItem($widgetGroupItemDto);
