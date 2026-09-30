@@ -13808,7 +13808,7 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/wobqqq/oc-fortify-plugin.git",
-                "reference": "f04ef4f499cd1be4c3f8e8731767c446d771ca1c"
+                "reference": "9c1e9688e808f3641d78f11dc6c6f751e4ceb473"
             },
             "require": {
                 "composer/installers": "^1.0 || ^2.0",
@@ -13930,11 +13930,11 @@
                 "source": "https://github.com/wobqqq/oc-fortify-plugin",
                 "security": "https://github.com/wobqqq/oc-fortify-plugin/security/policy"
             },
-            "time": "2026-09-30T18:00:36+00:00",
+            "time": "2026-09-30T18:26:19+00:00",
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/wobqqq/oc-fortify-plugin/zipball/f04ef4f499cd1be4c3f8e8731767c446d771ca1c",
-                "reference": "f04ef4f499cd1be4c3f8e8731767c446d771ca1c",
+                "url": "https://api.github.com/repos/wobqqq/oc-fortify-plugin/zipball/9c1e9688e808f3641d78f11dc6c6f751e4ceb473",
+                "reference": "9c1e9688e808f3641d78f11dc6c6f751e4ceb473",
                 "shasum": ""
             }
         }
