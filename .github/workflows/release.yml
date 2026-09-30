@@ -1,8 +1,9 @@
 name: Release
 
 # A version is published by pushing its tag (v1.2.3 or 1.2.3) to a commit on main.
-# The October CMS marketplace is asked to build it only once the whole CI has passed
-# on that commit; its Update URL is the OCTOBER_MARKETPLACE_UPDATE_URL secret.
+# Once the whole CI has passed on that commit, the GitHub release is published and the
+# October CMS marketplace is asked to build it (its Update URL is the
+# OCTOBER_MARKETPLACE_UPDATE_URL secret).
 
 on:
   push:
@@ -63,3 +64,28 @@ jobs:
             --request POST --header 'Content-Type: application/json' \
             --data "{\"ref\":\"$GITHUB_REF\",\"after\":\"$GITHUB_SHA\"}" \
             "$UPDATE_URL" > /dev/null
+
+  github-release:
+    name: GitHub release
+    needs: ci
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Take the version note from updates/version.yaml
+        run: |
+          awk -v v="$GITHUB_REF_NAME" -v bare="${GITHUB_REF_NAME#v}" '
+            $0 ~ "^v?" bare ":" {found=1; next}
+            found && /^v?[0-9]/ {exit}
+            found && /^ *- / {sub(/^ *- /, ""); gsub(/^'"'"'|'"'"'$/, ""); if ($0 !~ /\.php$/) print "- " $0}
+          ' updates/version.yaml > notes.md
+
+      - name: Publish the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" --verify-tag --title "$GITHUB_REF_NAME" --notes-file notes.md --generate-notes
