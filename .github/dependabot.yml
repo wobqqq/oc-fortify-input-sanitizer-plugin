@@ -1,0 +1,26 @@
+# One pull request a week per ecosystem, lock files only: the version ranges in
+# composer.json move on purpose, never by a bot. Security updates come as their own
+# pull requests when "Dependabot security updates" is on in the repository settings.
+version: 2
+
+updates:
+  - package-ecosystem: composer
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    versioning-strategy: lockfile-only
+    open-pull-requests-limit: 3
+    groups:
+      composer:
+        patterns: ['*']
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 3
+    groups:
+      github-actions:
+        patterns: ['*']

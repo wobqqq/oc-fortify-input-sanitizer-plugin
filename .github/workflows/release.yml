@@ -1,0 +1,65 @@
+name: Release
+
+# A version is published by pushing its tag (v1.2.3 or 1.2.3) to a commit on main.
+# The October CMS marketplace is asked to build it only once the whole CI has passed
+# on that commit; its Update URL is the OCTOBER_MARKETPLACE_UPDATE_URL secret.
+
+on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+      - '[0-9]+.[0-9]+.[0-9]+'
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: Tag matches main and the version history
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: The tagged commit is on main
+        run: git merge-base --is-ancestor "$GITHUB_SHA" origin/main
+
+      - name: The tag is the latest version in updates/version.yaml
+        run: |
+          latest=$(grep -E '^v?[0-9]+\.[0-9]+\.[0-9]+:' updates/version.yaml | tail -n 1 | tr -d ':' | sed 's/^v//')
+          tag=${GITHUB_REF_NAME#v}
+          if [ "$tag" != "$latest" ]; then
+            echo "::error::The tag $GITHUB_REF_NAME does not match the latest version $latest in updates/version.yaml"
+            exit 1
+          fi
+
+  ci:
+    needs: verify
+    uses: ./.github/workflows/ci.yml
+
+  marketplace:
+    name: Publish to the October CMS marketplace
+    needs: ci
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    environment: marketplace
+    steps:
+      - name: Ask the marketplace to build the release
+        env:
+          UPDATE_URL: ${{ secrets.OCTOBER_MARKETPLACE_UPDATE_URL }}
+        run: |
+          if [ -z "$UPDATE_URL" ]; then
+            echo "::error::Add the plugin's Update URL from the marketplace as the OCTOBER_MARKETPLACE_UPDATE_URL secret"
+            exit 1
+          fi
+          curl --fail-with-body --silent --show-error --retry 3 --retry-all-errors --max-time 60 \
+            --request POST --header 'Content-Type: application/json' \
+            --data "{\"ref\":\"$GITHUB_REF\",\"after\":\"$GITHUB_SHA\"}" \
+            "$UPDATE_URL" > /dev/null
