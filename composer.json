@@ -11,7 +11,10 @@
         "xss",
         "waf",
         "input-sanitizer",
-        "fortify"
+        "fortify",
+        "laravel",
+        "sql-injection",
+        "input-validation"
     ],
     "authors": [
         {
@@ -19,10 +22,11 @@
             "homepage": "https://github.com/wobqqq"
         }
     ],
-    "homepage": "https://github.com/wobqqq/oc-fortify-input-sanitizer-plugin",
+    "homepage": "https://octobercms.com/plugin/wobqqq-fortifyinputsanitizer",
     "support": {
         "issues": "https://github.com/wobqqq/oc-fortify-input-sanitizer-plugin/issues",
         "source": "https://github.com/wobqqq/oc-fortify-input-sanitizer-plugin",
+        "docs": "https://github.com/wobqqq/oc-fortify-input-sanitizer-plugin#readme",
         "security": "https://github.com/wobqqq/oc-fortify-input-sanitizer-plugin/security/policy"
     },
     "require": {
