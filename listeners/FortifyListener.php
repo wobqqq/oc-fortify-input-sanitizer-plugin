@@ -17,6 +17,7 @@ use Wobqqq\Fortify\Transformers\FortifyTransformer;
 use Wobqqq\FortifyInputSanitizer\Cache\InputSanitizerDtoCache;
 use Wobqqq\FortifyInputSanitizer\Instances\InputSanitizerDtoInstance;
 use Wobqqq\FortifyInputSanitizer\Services\InputSanitizerService;
+use Wobqqq\FortifyInputSanitizer\Transformers\FortifyTransformer as InputSanitizerTransformer;
 
 final readonly class FortifyListener
 {
@@ -27,38 +28,37 @@ final readonly class FortifyListener
 
     /**
      * @param Dispatcher $event
-     * @return void
      */
     public function subscribe($event): void
     {
-        $event->listen(FortifyEvent::SERVICES_WIDGET_GROUP_ITEM_INPUT_SANITIZER->value, function (WidgetGroupItemDto &$widgetGroupItemDto) {
+        $event->listen(FortifyEvent::SERVICES_WIDGET_GROUP_ITEM_INPUT_SANITIZER->value, function (WidgetGroupItemDto &$widgetGroupItemDto): void {
             $this->serveWidgetGroupItem($widgetGroupItemDto);
         });
 
-        $event->listen(FortifyEvent::MODEL_FORTIFY_INIT_SETTINGS_DATA->value, function (Fortify &$fortify) {
+        $event->listen(FortifyEvent::MODEL_FORTIFY_INIT_SETTINGS_DATA->value, function (Fortify &$fortify): void {
             $this->serveModelInitSettingsData($fortify);
         });
 
-        Fortify::extend(function (Fortify $fortify) {
+        Fortify::extend(function (Fortify $fortify): void {
             $this->serveModel($fortify);
-
-            $fortify->bindEvent('model.afterSave', function () {
-                $this->inputSanitizerDtoCache->clear();
-            });
-
-            $fortify->bindEvent('model.afterDelete', function () {
-                $this->inputSanitizerDtoCache->clear();
-            });
         });
 
-        $event->listen('backend.form.extendFields', function (Form $form) {
+        // Model events, not bindEvent(): the settings instance may predate this listener.
+        $event->listen(
+            ['eloquent.saved: ' . Fortify::class, 'eloquent.deleted: ' . Fortify::class],
+            function (): void {
+                $this->inputSanitizerDtoCache->clear();
+            },
+        );
+
+        $event->listen('backend.form.extendFields', function (Form $form): void {
             if (!$form->getController() instanceof Settings || !$form->model instanceof Fortify || $form->isNested) {
                 return;
             }
 
-            /** @var Fortify $fortify */
             $fortify = $form->model;
 
+            $this->serveModel($fortify);
             $this->serveModelInitSettingsData($fortify);
             $this->serveFields($form);
         });
@@ -89,13 +89,13 @@ final readonly class FortifyListener
             ? $fortify->input_sanitizer
             : [];
 
-        if (!empty($inputSanitizer)) {
+        if ($inputSanitizer !== []) {
             return;
         }
 
         $inputSanitizer['cms_enabled'] = false;
         $inputSanitizer['view'] = View::BAD_REQUEST->value;
-        $inputSanitizer['block_threshold'] = 1;
+        $inputSanitizer['block_threshold'] = InputSanitizerTransformer::DEFAULT_BLOCK_THRESHOLD;
         $inputSanitizer['xss_patterns'] = '~<\s*(script|iframe|object|embed|svg|meta|base|form|input|button)\b|javascript\s*:|vbscript\s*:|data\s*:\s*text/html|<[^>]+?\s+on[a-z]{3,30}\s*=~ix';
         $inputSanitizer['encoded_xss_patterns'] = '~(&lt;|%3c|%253c)\s*script~ix';
         $inputSanitizer['command_injection_patterns'] = '~(?:^|[;&\s])\s*(cmd|powershell|bash|sh|curl|wget|nc)\b|[a-z0-9]\s*\|\s*[a-z0-9]|&&|`[^`]+`|\$\([^)]*\)~ix';
@@ -103,8 +103,6 @@ final readonly class FortifyListener
         $inputSanitizer['ssti_patterns'] = '~\{\{.*?\}\}|\{%.*?%\}|\{!!.*?!!\}~sx';
         $inputSanitizer['null_byte_patterns'] = '~\x00|%00|\\\\0|\\\\x00~ix';
         $inputSanitizer['csv_injection_patterns'] = '~^\s*[=<$#]~x';
-        /** @noinspection PhpUndefinedFieldInspection */
-        /** @phpstan-ignore-next-line */
         $fortify->input_sanitizer = $inputSanitizer;
     }
 
@@ -117,7 +115,7 @@ final readonly class FortifyListener
         $fortify->rules['input_sanitizer.block_threshold'] = 'required|int|min:1|max:1000';
 
         foreach (InputSanitizerService::PATTERNS as $pattern) {
-            $fortify->rules[sprintf('input_sanitizer.%s', $pattern)] = 'nullable|string|max:500';
+            $fortify->rules[sprintf('input_sanitizer.%s', $pattern)] = 'nullable|string|max:500|input_sanitizer_regex';
         }
 
         $fortify->rules['input_sanitizer.excluded_headers.*.name'] = 'nullable|string|max:50|regex:/^[A-Za-z0-9-]+$/';
@@ -170,7 +168,7 @@ final readonly class FortifyListener
                 'span' => 'full',
                 'required' => true,
                 'type' => 'number',
-                'default' => 1,
+                'default' => InputSanitizerTransformer::DEFAULT_BLOCK_THRESHOLD,
                 'tab' => 'wobqqq.fortify::lang.tabs.input_sanitizer',
                 'comment' => 'wobqqq.fortify::lang.comments.block_threshold',
                 'trigger' => [

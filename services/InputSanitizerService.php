@@ -7,6 +7,7 @@ namespace Wobqqq\FortifyInputSanitizer\Services;
 use App;
 use Config;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use October\Rain\Router\CoreRouter;
 use Str;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -27,14 +28,9 @@ final class InputSanitizerService
         'csv_injection_patterns',
     ];
 
-    private InputSanitizerDto $inputSanitizerDto;
+    private const DECODE_ROUNDS = 3;
 
     private static bool $addMiddleware = false;
-
-    public function __construct()
-    {
-        $this->inputSanitizerDto = InputSanitizerDtoInstance::instance()->get();
-    }
 
     public function addMiddleware(): void
     {
@@ -44,9 +40,7 @@ final class InputSanitizerService
 
         self::$addMiddleware = true;
 
-        $inputSanitizer = InputSanitizerDtoInstance::instance()->get();
-
-        if (!$inputSanitizer->cmsEnabled) {
+        if (!$this->dto()->cmsEnabled) {
             return;
         }
 
@@ -59,14 +53,14 @@ final class InputSanitizerService
 
     public function disable(): void
     {
-        /** @var array<string, mixed>|\Illuminate\Support\Collection<int, mixed> $inputSanitizer */
+        /** @var array<string, mixed>|Collection<int, mixed>|null $inputSanitizer */
         $inputSanitizer = Fortify::get('input_sanitizer');
 
-        if ($inputSanitizer instanceof \Illuminate\Support\Collection) {
+        if ($inputSanitizer instanceof Collection) {
             $inputSanitizer = $inputSanitizer->toArray();
         }
 
-        $inputSanitizer = !is_array($inputSanitizer) ? [] : $inputSanitizer;
+        $inputSanitizer = is_array($inputSanitizer) ? $inputSanitizer : [];
 
         $inputSanitizer['cms_enabled'] = false;
 
@@ -74,7 +68,12 @@ final class InputSanitizerService
     }
 
     /**
+     * Scores the query, the form input, the headers and the URL segments together; the request
+     * is refused once the score reaches the threshold.
+     *
      * @param array<int|string, mixed> $data
+     *
+     * @throws BadRequestHttpException
      */
     public function check(array $data, Request $request): void
     {
@@ -90,10 +89,10 @@ final class InputSanitizerService
      */
     public function scanInput(array $data, int &$score): void
     {
-        foreach ($data as $key => $value) {
-            $key = Str::lower((string)$key);
+        $excludedInputs = $this->dto()->excludedInputs;
 
-            if (isset($this->inputSanitizerDto->excludedInputs[$key])) {
+        foreach ($data as $key => $value) {
+            if (isset($excludedInputs[Str::lower((string)$key)])) {
                 continue;
             }
 
@@ -103,75 +102,65 @@ final class InputSanitizerService
                 continue;
             }
 
-            if (!is_string($value) || $value === '') {
-                continue;
+            if (is_string($value) && $value !== '') {
+                $this->score($value, $score);
             }
-
-            $this->score($value, $score);
         }
     }
 
     public function scanUrlSegments(Request $request, int &$score): void
     {
         foreach ($request->segments() as $segment) {
-            if ($segment === '') {
-                continue;
+            if (is_string($segment) && $segment !== '') {
+                $this->score($segment, $score);
             }
-
-            $this->score($segment, $score);
         }
     }
 
     public function scanHeaders(Request $request, int &$score): void
     {
-        foreach ($request->headers->all() as $key => $values) {
-            $key = Str::lower($key);
+        $excludedHeaders = $this->dto()->excludedHeaders;
 
-            if (isset($this->inputSanitizerDto->excludedHeaders[$key])) {
+        foreach ($request->headers->all() as $key => $values) {
+            if (isset($excludedHeaders[Str::lower($key)])) {
                 continue;
             }
 
             foreach ($values as $value) {
-                if (!is_string($value) || $value === '') {
-                    continue;
+                if (is_string($value) && $value !== '') {
+                    $this->score($value, $score);
                 }
-
-                $this->score($value, $score);
             }
         }
+    }
+
+    private function dto(): InputSanitizerDto
+    {
+        return InputSanitizerDtoInstance::instance()->get();
     }
 
     private function overrideConfig(): void
     {
-        /** @var string|null|array<int, string> $middleware */
         $middleware = Config::get('cms.middleware_group', []);
-
-        if (is_string($middleware)) {
-            $middleware = [$middleware];
-        }
-
-        if (empty($middleware)) {
-            $middleware = [];
-        }
+        $middleware = is_string($middleware) ? [$middleware] : (is_array($middleware) ? $middleware : []);
+        $middleware = array_filter($middleware, static fn (mixed $name): bool => is_string($name) && $name !== '');
 
         $middleware[] = InputSanitizerMiddleware::ALIAS;
-        /** @var array<int, string> $middleware */
-        $middleware = array_unique($middleware);
-        $middleware = array_filter($middleware);
 
-        Config::set('cms.middleware_group', $middleware);
+        Config::set('cms.middleware_group', array_values(array_unique($middleware)));
     }
 
     private function score(string $input, int &$score): void
     {
+        $dto = $this->dto();
         $decoded = str_replace(["\r", "\n"], '', $this->multiDecode($input));
 
-        foreach ($this->inputSanitizerDto->patterns as $pattern) {
-            if (preg_match($pattern, $decoded)) {
-                $score += 1;
+        foreach ($dto->patterns as $pattern) {
+            if (PatternMatcher::matches($pattern, $decoded)) {
+                $score++;
             }
 
-            if ($score >= $this->inputSanitizerDto->blockThreshold) {
+            if ($score >= $dto->blockThreshold) {
                 throw new BadRequestHttpException('Malicious input detected');
             }
         }
@@ -181,7 +170,7 @@ final class InputSanitizerService
     {
         $decoded = $input;
 
-        for ($i = 0; $i < 3; $i++) {
+        for ($i = 0; $i < self::DECODE_ROUNDS; $i++) {
             $new = urldecode($decoded);
 
             if ($new === $decoded) {

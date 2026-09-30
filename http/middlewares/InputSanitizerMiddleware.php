@@ -7,26 +7,24 @@ namespace Wobqqq\FortifyInputSanitizer\Http\Middlewares;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\View as IlluminateView;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Wobqqq\Fortify\Enums\View;
 use Wobqqq\FortifyInputSanitizer\Instances\InputSanitizerDtoInstance;
 use Wobqqq\FortifyInputSanitizer\Services\InputSanitizerService;
 
-final class InputSanitizerMiddleware
+final readonly class InputSanitizerMiddleware
 {
     public const ALIAS = 'fortify_cms_input_sanitizer';
 
-
-    public function __construct(private readonly InputSanitizerService $inputSanitizerService)
+    public function __construct(private InputSanitizerService $inputSanitizerService)
     {
     }
 
     /**
-     * @param Request $request
-     * @param Closure $next
-     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response|mixed
+     * @param Closure(Request): mixed $next
      */
-    public function handle(Request $request, Closure $next)
+    public function handle(Request $request, Closure $next): mixed
     {
         $inputSanitizerDto = InputSanitizerDtoInstance::instance()->get();
 
@@ -35,15 +33,8 @@ final class InputSanitizerMiddleware
         }
 
         try {
-            /** @var array<string, string|int|null|array<mixed,mixed>> $query */
-            $query = $request->query->all();
-            /** @var array<string, string|int|null|array<mixed,mixed>> $post */
-            $post = $request->post();
-            $input = array_merge($query, $post);
-            /** @var array<string, string|int|null|array<mixed,mixed>> $input */
-
-            $this->inputSanitizerService->check($input, $request);
-        } catch (BadRequestHttpException $e) {
+            $this->inputSanitizerService->check(array_merge($request->query->all(), $request->request->all()), $request);
+        } catch (BadRequestHttpException) {
             $view = IlluminateView::exists($inputSanitizerDto->view)
                 ? $inputSanitizerDto->view
                 : View::BAD_REQUEST->value;
@@ -51,7 +42,7 @@ final class InputSanitizerMiddleware
             /** @var \Illuminate\Routing\ResponseFactory $response */
             $response = response();
 
-            return $response->view($view, [], 400);
+            return $response->view($view, [], Response::HTTP_BAD_REQUEST);
         }
 
         return $next($request);

@@ -2,3 +2,5 @@ v1.0.1:
     - 'First version'
 v1.0.2:
     - 'Changes in events'
+v1.0.3:
+    - 'A pattern that does not compile is refused when the settings are saved and skipped instead of failing every request, a pattern that gives up on a long input no longer blocks it, and the settings are validated on every save and applied as soon as they are saved'

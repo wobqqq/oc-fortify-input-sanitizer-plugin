@@ -4,90 +4,47 @@ declare(strict_types=1);
 
 namespace Wobqqq\FortifyInputSanitizer\Transformers;
 
-use Arr;
 use Illuminate\Support\Facades\View as IlluminateView;
 use Str;
 use Wobqqq\Fortify\Enums\View;
 use Wobqqq\Fortify\Models\Fortify;
 use Wobqqq\FortifyInputSanitizer\Dto\InputSanitizerDto;
 use Wobqqq\FortifyInputSanitizer\Services\InputSanitizerService;
+use Wobqqq\FortifyInputSanitizer\Services\PatternMatcher;
 
 final readonly class FortifyTransformer
 {
+    public const DEFAULT_BLOCK_THRESHOLD = 1;
+
+    /** Headers whose values are never input a visitor typed. */
+    private const ALWAYS_EXCLUDED_HEADERS = ['cookie' => 1, 'accept' => 1];
+
     public static function inputSanitizerDto(): InputSanitizerDto
     {
-        /** @var bool|int|null $cmsEnabled */
-        $cmsEnabled = Fortify::get('input_sanitizer.cms_enabled');
-        $cmsEnabled = (bool)$cmsEnabled;
+        $cmsEnabled = (bool)Fortify::get('input_sanitizer.cms_enabled');
 
-        /** @var string|null $view */
         $view = Fortify::get('input_sanitizer.view');
-        $view = (string)$view;
-        $view = empty($view) || !IlluminateView::exists($view) ? View::BAD_REQUEST->value : $view;
+        $view = is_string($view) && $view !== '' && IlluminateView::exists($view) ? $view : View::BAD_REQUEST->value;
 
-        /** @var string|null|int $blockThreshold */
         $blockThreshold = Fortify::get('input_sanitizer.block_threshold');
-        $blockThreshold = (int)$blockThreshold;
-        $blockThreshold = empty($blockThreshold) ? 1 : $blockThreshold;
+        $blockThreshold = is_numeric($blockThreshold) && (int)$blockThreshold > 0 ? (int)$blockThreshold : self::DEFAULT_BLOCK_THRESHOLD;
+
+        $excludedHeaders = [];
+        $excludedInputs = [];
+        $patterns = [];
 
         if ($cmsEnabled) {
-            /** @var array<int, array<string, string|null>>|null $excludedHeadersTable */
-            $excludedHeadersTable = Fortify::get('input_sanitizer.excluded_headers');
-            $excludedHeadersTable = (empty($excludedHeadersTable) || !is_array($excludedHeadersTable))
-                ? []
-                : $excludedHeadersTable;
-            $excludedHeaders = ['cookie' => 1, 'accept' => 1];
-
-            foreach ($excludedHeadersTable as $excludedHeadersTableRow) {
-                /** @var string|null $header */
-                $header = Arr::get($excludedHeadersTableRow, 'name');
-
-                if (empty($header)) {
-                    continue;
-                }
-
-                $header = trim($header);
-                $header = Str::lower($header);
-
-                $excludedHeaders[$header] = 1;
-            }
-
-            /** @var array<int, array<string, string|null>>|null $excludedInputsTable */
-            $excludedInputsTable = Fortify::get('input_sanitizer.excluded_inputs');
-            $excludedInputsTable = (empty($excludedInputsTable) || !is_array($excludedInputsTable))
-                ? []
-                : $excludedInputsTable;
-            $excludedInputs = [];
-
-            foreach ($excludedInputsTable as $excludedInputsTableRow) {
-                /** @var string|null $input */
-                $input = Arr::get($excludedInputsTableRow, 'name');
-
-                if (empty($input)) {
-                    continue;
-                }
-
-                $input = trim($input);
-                $input = Str::lower($input);
-
-                $excludedInputs[$input] = 1;
-            }
-
-            $patterns = [];
+            $excludedHeaders = self::ALWAYS_EXCLUDED_HEADERS + self::names('input_sanitizer.excluded_headers');
+            $excludedInputs = self::names('input_sanitizer.excluded_inputs');
 
             foreach (InputSanitizerService::PATTERNS as $pattern) {
-                /** @var string|null $patternValue */
-                $patternValue = Fortify::get(sprintf('input_sanitizer.%s', $pattern));
-                $patternValue = trim((string)$patternValue);
+                $value = Fortify::get(sprintf('input_sanitizer.%s', $pattern));
+                $value = is_string($value) ? trim($value) : '';
 
-                if (!empty($patternValue)) {
-                    $patterns[] = $patternValue;
+                if (PatternMatcher::compiles($value)) {
+                    $patterns[] = $value;
                 }
             }
-        } else {
-            $excludedHeaders = [];
-            $excludedInputs = [];
-            $patterns = [];
         }
 
         return new InputSanitizerDto(
@@ -98,5 +55,24 @@ final readonly class FortifyTransformer
             $excludedInputs,
             $patterns,
         );
+    }
+
+    /**
+     * @return array<string, int> lower-case names found in the table
+     */
+    private static function names(string $setting): array
+    {
+        $rows = Fortify::get($setting);
+        $names = [];
+
+        foreach (is_array($rows) ? $rows : [] as $row) {
+            $name = is_array($row) && is_scalar($row['name'] ?? null) ? Str::lower(trim((string)$row['name'])) : '';
+
+            if ($name !== '') {
+                $names[$name] = 1;
+            }
+        }
+
+        return $names;
     }
 }

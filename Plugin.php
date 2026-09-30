@@ -6,9 +6,11 @@ namespace Wobqqq\FortifyInputSanitizer;
 
 use Event;
 use System\Classes\PluginBase;
+use Validator;
 use Wobqqq\FortifyInputSanitizer\Console\InputSanitizerDisableCommand;
 use Wobqqq\FortifyInputSanitizer\Listeners\FortifyListener;
 use Wobqqq\FortifyInputSanitizer\Services\InputSanitizerService;
+use Wobqqq\FortifyInputSanitizer\Validator\Rules\InputSanitizerRegexRule;
 
 final class Plugin extends PluginBase
 {
@@ -23,12 +25,18 @@ final class Plugin extends PluginBase
     public function boot(): void
     {
         $this->registerEvents();
+        $this->registerValidatorRules();
         $this->runService();
     }
 
     private function registerEvents(): void
     {
         Event::subscribe(FortifyListener::class);
+    }
+
+    private function registerValidatorRules(): void
+    {
+        Validator::extend('input_sanitizer_regex', InputSanitizerRegexRule::class);
     }
 
     private function runService(): void
