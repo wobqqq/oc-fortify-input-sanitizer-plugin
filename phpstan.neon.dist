@@ -1,0 +1,28 @@
+parameters:
+    level: max
+    phpVersion:
+        min: 80200
+        max: 80499
+    paths:
+        - Plugin.php
+        - cache
+        - console
+        - dto
+        - http
+        - instances
+        - listeners
+        - services
+        - transformers
+        - validator
+        - tests
+    excludePaths:
+        - tests/Stubs
+        # Pest's arch() DSL is declarative configuration that PHPStan cannot type.
+        - tests/Unit/ArchitectureTest.php
+    scanFiles:
+        - tests/Stubs/October.php
+    stubFiles:
+        - stubs/Singleton.stub
+    strictRules:
+        dynamicCallOnStaticMethod: false
+    treatPhpDocTypesAsCertain: false

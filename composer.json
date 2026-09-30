@@ -1,12 +1,123 @@
 {
     "name": "wobqqq/fortifyinputsanitizer-plugin",
+    "description": "Fortify module for October CMS: blocks the requests that carry XSS, injection or traversal payloads",
+    "license": "proprietary",
     "type": "october-plugin",
-    "description": "Setting up the application protection system",
-    "homepage": "https://github.com/wobqqq/oc-fortify-plugin",
-    "keywords": ["october", "octobercms", "fortify"],
-    "license": "commercial",
+    "keywords": [
+        "october",
+        "octobercms",
+        "october-plugin",
+        "security",
+        "xss",
+        "waf",
+        "input-sanitizer",
+        "fortify"
+    ],
+    "authors": [
+        {
+            "name": "Sergey Zakharevich",
+            "homepage": "https://github.com/wobqqq"
+        }
+    ],
+    "homepage": "https://github.com/wobqqq/oc-fortify-input-sanitizer-plugin",
+    "support": {
+        "issues": "https://github.com/wobqqq/oc-fortify-input-sanitizer-plugin/issues",
+        "source": "https://github.com/wobqqq/oc-fortify-input-sanitizer-plugin",
+        "security": "https://github.com/wobqqq/oc-fortify-input-sanitizer-plugin/security/policy"
+    },
     "require": {
-        "php": ">=8.2.0",
-        "composer/installers": "~1.0"
+        "php": "^8.2",
+        "composer/installers": "^1.0 || ^2.0"
+    },
+    "require-dev": {
+        "ergebnis/composer-normalize": "^2.48",
+        "friendsofphp/php-cs-fixer": "^3.88",
+        "october/rain": "^4.4",
+        "orchestra/testbench": "^10.6",
+        "pestphp/pest": "^4.1",
+        "phpstan/extension-installer": "^1.4",
+        "phpstan/phpstan": "^2.1",
+        "phpstan/phpstan-deprecation-rules": "^2.0",
+        "phpstan/phpstan-strict-rules": "^2.0",
+        "rector/rector": "^2.2",
+        "wobqqq/fortify-plugin": "dev-main"
+    },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "/core"
+        }
+    ],
+    "autoload-dev": {
+        "psr-4": {
+            "Wobqqq\\FortifyInputSanitizer\\Tests\\": "tests/"
+        },
+        "classmap": [
+            "Plugin.php",
+            "cache/",
+            "console/",
+            "dto/",
+            "http/",
+            "instances/",
+            "listeners/",
+            "services/",
+            "transformers/",
+            "validator/",
+            "vendor/wobqqq/fortify-plugin/"
+        ],
+        "files": [
+            "tests/Stubs/October.php"
+        ],
+        "exclude-from-classmap": [
+            "vendor/wobqqq/fortify-plugin/tests/",
+            "vendor/wobqqq/fortify-plugin/stubs/"
+        ]
+    },
+    "config": {
+        "allow-plugins": {
+            "composer/installers": true,
+            "ergebnis/composer-normalize": true,
+            "pestphp/pest-plugin": true,
+            "phpstan/extension-installer": true
+        },
+        "platform": {
+            "php": "8.4.99"
+        },
+        "sort-packages": true
+    },
+    "extra": {
+        "installer-disable": true
+    },
+    "scripts": {
+        "code.check": [
+            "@composer validate --strict",
+            "@composer normalize --dry-run",
+            "@composer audit --abandoned=report",
+            "@code.lint",
+            "@code.yaml.check",
+            "@code.cs.check",
+            "@code.rector.check",
+            "@code.stan"
+        ],
+        "code.cs.check": "php-cs-fixer fix --diff --dry-run",
+        "code.cs.fix": "php-cs-fixer fix --diff",
+        "code.fix": [
+            "@composer normalize --no-update-lock",
+            "@code.cs.fix",
+            "@code.rector.fix"
+        ],
+        "code.lint": "find . -path ./vendor -prune -o \\( -name '*.php' -o -name '*.htm' \\) -print0 | xargs -0 -n1 -P4 php -l > /dev/null",
+        "code.rector.check": "rector process --dry-run",
+        "code.rector.fix": "rector process",
+        "code.stan": "phpstan analyse --memory-limit=1G",
+        "code.yaml.check": "yaml-lint plugin.yaml updates/ .github/",
+        "ready": [
+            "@code.fix",
+            "@code.check",
+            "@test.coverage"
+        ],
+        "test": "pest",
+        "test.coverage": "@php -d pcov.enabled=1 -d pcov.directory=. -d pcov.exclude=\"~/(vendor|tests)/~\" vendor/bin/pest --coverage --min=90",
+        "test.mutate": "@php -d pcov.enabled=1 -d pcov.directory=. -d pcov.exclude=\"~/(vendor|tests)/~\" vendor/bin/pest --mutate --parallel --min=70"
     }
 }

@@ -1,0 +1,8 @@
+/vendor/
+/.phpunit.cache/
+/.php-cs-fixer.cache
+/coverage/
+/.idea/
+/.vscode/
+/.claude/settings.local.json
+.DS_Store

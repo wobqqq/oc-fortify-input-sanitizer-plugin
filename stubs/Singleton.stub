@@ -1,0 +1,18 @@
+<?php
+
+namespace October\Rain\Support\Traits;
+
+/**
+ * October's Singleton declares no return type on instance(), which PHPStan would widen to mixed.
+ */
+trait Singleton
+{
+    /** @return static */
+    final public static function instance()
+    {
+    }
+
+    final public static function forgetInstance(): void
+    {
+    }
+}
