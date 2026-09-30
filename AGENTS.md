@@ -4,7 +4,7 @@ Guidance for AI coding agents (Claude Code, Codex, Junie, Cursor) working in thi
 
 ## What this is
 
-**Input Sanitizer** (`Wobqqq.FortifyInputSanitizer`) is a paid module of the Fortify security suite for October CMS 3.x/4.x (built and tested against 4.4 on Laravel 12, PHP 8.2+). It scores every front-end request — the query string, the form input (nested arrays included), the headers and the URL segments, each decoded up to three times — against the administrator's regular expressions for XSS, encoded XSS, command injection, path traversal, template injection, null bytes and CSV injection, and answers 400 with the page the administrator chose once the score reaches the threshold.
+**Input Sanitizer** (`Wobqqq.FortifyInputSanitizer`) is a free module of the Fortify security suite for October CMS 3.x/4.x (built and tested against 4.4 on Laravel 12, PHP 8.2+). It scores every front-end request — the query string, the form input (nested arrays included), the headers and the URL segments, each decoded up to three times — against the administrator's regular expressions for XSS, encoded XSS, command injection, path traversal, template injection, null bytes and CSV injection, and answers 400 with the page the administrator chose once the score reaches the threshold.
 
 It requires the core plugin [`Wobqqq.Fortify`](https://github.com/wobqqq/oc-fortify-plugin): the settings live in the core's `Wobqqq\Fortify\Models\Fortify` record under the `input_sanitizer` key and appear on **Settings → Fortify**, and the module draws its own item on the core's dashboard widget.
 

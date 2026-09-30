@@ -4,7 +4,7 @@
 [![October CMS](https://img.shields.io/badge/October%20CMS-3.x%20%7C%204.x-e24848)](https://octobercms.com/plugin/wobqqq-fortifyinputsanitizer)
 [![PHP](https://img.shields.io/badge/PHP-8.2%2B-777bb4)](composer.json)
 [![PHPStan](https://img.shields.io/badge/PHPStan-level%20max-brightgreen)](phpstan.neon.dist)
-[![License](https://img.shields.io/badge/License-Commercial-orange)](LICENSE.md)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE.md)
 
 **Input Sanitizer** protects your application by blocking malicious input data in requests.
 

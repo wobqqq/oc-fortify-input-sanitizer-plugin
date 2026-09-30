@@ -1,7 +1,7 @@
 {
     "name": "wobqqq/fortifyinputsanitizer-plugin",
     "description": "Fortify module for October CMS: blocks the requests that carry XSS, injection or traversal payloads",
-    "license": "proprietary",
+    "license": "MIT",
     "type": "october-plugin",
     "keywords": [
         "october",
