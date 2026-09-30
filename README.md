@@ -71,7 +71,7 @@ Please report a vulnerability privately, as described in [SECURITY.md](SECURITY.
 
 ## 🛠️ Development
 
-The toolchain runs in Docker, the host needs nothing but `docker` and `make`. The module is tested together with the [Fortify core](https://github.com/wobqqq/oc-fortify-plugin), which Composer installs from its `main` branch.
+The toolchain runs in Docker, the host needs nothing but `docker` and `make`. The module is tested together with the [Fortify core](https://github.com/wobqqq/oc-fortify-plugin), which Composer installs from Packagist.
 
 ```bash
 make install        # composer install

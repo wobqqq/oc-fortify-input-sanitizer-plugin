@@ -15,7 +15,7 @@ This is a **security product installed on production sites**. A bug here locks a
 Everything runs in Docker; the host needs no PHP.
 
 ```bash
-make install        # composer install inside the php container (the core comes from its GitHub main branch)
+make install        # composer install inside the php container (the core comes from Packagist, as `wobqqq/fortify-plugin`)
 make code.fix       # composer normalize, rector, php-cs-fixer
 make code.check     # validate, normalize --dry-run, audit, php -l, yaml-lint, cs, rector, PHPStan max
 make test           # Pest

@@ -54,8 +54,8 @@ jobs:
 
       - uses: ramsey/composer-install@65e4f84970763564f46a70b8a54b90d033b3bdda # 4.0.0
 
-      - name: Update the core to its latest commit
-        run: composer update wobqqq/fortify-plugin --no-interaction --no-progress
+      - name: Install the core from its main branch
+        run: composer require wobqqq/fortify-plugin:dev-main --no-interaction --no-progress --with-all-dependencies
 
       - name: Tests
         run: composer test

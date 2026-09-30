@@ -27,7 +27,8 @@
     },
     "require": {
         "php": "^8.2",
-        "composer/installers": "^1.0 || ^2.0"
+        "composer/installers": "^1.0 || ^2.0",
+        "wobqqq/fortify-plugin": "^1.0.3"
     },
     "require-dev": {
         "ergebnis/composer-normalize": "^2.48",
@@ -39,15 +40,8 @@
         "phpstan/phpstan": "^2.1",
         "phpstan/phpstan-deprecation-rules": "^2.0",
         "phpstan/phpstan-strict-rules": "^2.0",
-        "rector/rector": "^2.2",
-        "wobqqq/fortify-plugin": "dev-main"
+        "rector/rector": "^2.2"
     },
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/wobqqq/oc-fortify-plugin"
-        }
-    ],
     "autoload-dev": {
         "psr-4": {
             "Wobqqq\\FortifyInputSanitizer\\Tests\\": "tests/"
