@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a7d834340d0f8ecabf42e2cc09a7fbc9",
+    "content-hash": "ae528a90906d23672ee5c0aa304b66a2",
     "packages": [
         {
             "name": "composer/installers",
@@ -13808,7 +13808,7 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/wobqqq/oc-fortify-plugin.git",
-                "reference": "9c1e9688e808f3641d78f11dc6c6f751e4ceb473"
+                "reference": "7485b88e118ecb1b3c66dfcc25427edcddcc3971"
             },
             "require": {
                 "composer/installers": "^1.0 || ^2.0",
@@ -13930,11 +13930,11 @@
                 "source": "https://github.com/wobqqq/oc-fortify-plugin",
                 "security": "https://github.com/wobqqq/oc-fortify-plugin/security/policy"
             },
-            "time": "2026-09-30T18:26:19+00:00",
+            "time": "2026-09-30T19:03:58+00:00",
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/wobqqq/oc-fortify-plugin/zipball/9c1e9688e808f3641d78f11dc6c6f751e4ceb473",
-                "reference": "9c1e9688e808f3641d78f11dc6c6f751e4ceb473",
+                "url": "https://api.github.com/repos/wobqqq/oc-fortify-plugin/zipball/7485b88e118ecb1b3c66dfcc25427edcddcc3971",
+                "reference": "7485b88e118ecb1b3c66dfcc25427edcddcc3971",
                 "shasum": ""
             }
         }
