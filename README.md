@@ -1,10 +1,12 @@
 # Input Sanitizer
 
 [![CI](https://github.com/wobqqq/oc-fortify-input-sanitizer-plugin/actions/workflows/ci.yml/badge.svg)](https://github.com/wobqqq/oc-fortify-input-sanitizer-plugin/actions/workflows/ci.yml)
-[![October CMS](https://img.shields.io/badge/October%20CMS-3.x%20%7C%204.x-e24848)](https://octobercms.com/plugin/wobqqq-fortifyinputsanitizer)
-[![PHP](https://img.shields.io/badge/PHP-8.2%2B-777bb4)](composer.json)
-[![PHPStan](https://img.shields.io/badge/PHPStan-level%20max-brightgreen)](phpstan.neon.dist)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE.md)
+[![Packagist](https://img.shields.io/packagist/v/wobqqq/fortifyinputsanitizer-plugin)](https://packagist.org/packages/wobqqq/fortifyinputsanitizer-plugin)
+[![Downloads](https://img.shields.io/packagist/dt/wobqqq/fortifyinputsanitizer-plugin)](https://packagist.org/packages/wobqqq/fortifyinputsanitizer-plugin)
+[![Marketplace](https://img.shields.io/badge/October%20CMS-Marketplace-e24848)](https://octobercms.com/plugin/wobqqq-fortifyinputsanitizer)
+[![PHP](https://img.shields.io/badge/PHP-8.2%2B-777bb4)](https://github.com/wobqqq/oc-fortify-input-sanitizer-plugin/blob/main/composer.json)
+[![PHPStan](https://img.shields.io/badge/PHPStan-level%20max-brightgreen)](https://github.com/wobqqq/oc-fortify-input-sanitizer-plugin/blob/main/phpstan.neon.dist)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/wobqqq/oc-fortify-input-sanitizer-plugin/blob/main/LICENSE.md)
 
 **Input Sanitizer** protects your application by blocking malicious input data in requests.
 
@@ -41,6 +43,16 @@ This widget acts as a central hub, allowing you to monitor and manage your appli
 - October CMS 3.x or 4.x
 - [Fortify](https://octobercms.com/plugin/wobqqq-fortify)
 
+## 📥 Installation
+
+| From | How |
+|---|---|
+| **October CMS Marketplace** | [octobercms.com/plugin/wobqqq-fortifyinputsanitizer](https://octobercms.com/plugin/wobqqq-fortifyinputsanitizer), or **Settings → Updates & Plugins → Install plugins** in the backend and search for “Fortify Input Sanitizer” |
+| **Artisan** | `php artisan plugin:install Wobqqq.FortifyInputSanitizer` |
+| **Composer** | `composer require wobqqq/fortifyinputsanitizer-plugin` then `php artisan october:migrate` |
+
+It needs the [Fortify](https://octobercms.com/plugin/wobqqq-fortify) core plugin: Composer installs it with the module, from the marketplace install **Fortify** first.
+
 ## 💻 Usage
 
 All configuration and management is handled via the October CMS admin panel.
@@ -67,11 +79,11 @@ php artisan wobqqq.fortify:input-sanitizer:disable
 
 ## 🔒 Security
 
-Please report a vulnerability privately, as described in [SECURITY.md](SECURITY.md).
+Please report a vulnerability privately, as described in [SECURITY.md](https://github.com/wobqqq/oc-fortify-input-sanitizer-plugin/blob/main/SECURITY.md).
 
 ## 🛠️ Development
 
-The toolchain runs in Docker, the host needs nothing but `docker` and `make`. The module is tested together with the [Fortify core](https://github.com/wobqqq/oc-fortify-plugin), which Composer installs from its `main` branch.
+The toolchain runs in Docker, the host needs nothing but `docker` and `make`. The module is tested together with the [Fortify core](https://github.com/wobqqq/oc-fortify-plugin), which Composer installs from Packagist.
 
 ```bash
 make install        # composer install
