@@ -4,8 +4,6 @@ name: Security audit
 # while the repository is quiet.
 
 on:
-  schedule:
-    - cron: '17 5 * * 1'
   workflow_dispatch:
 
 permissions:
