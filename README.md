@@ -14,7 +14,7 @@ Fully integrated with the [Fortify](https://octobercms.com/plugin/wobqqq-fortify
 
 ## 📊 Security Dashboard Widget
 
-Fortify includes a built-in dashboard widget that gives you a real-time overview of your system’s security status.
+Fortify includes a dashboard widget that gives you an overview of your application’s security status.
 
 - Highlights critical vulnerabilities and misconfigurations
 - Provides quick access to all security checks and tools
@@ -24,8 +24,8 @@ This widget acts as a central hub, allowing you to monitor and manage your appli
 
 ## 🚀 Features
 
-- Detects and blocks malicious payloads
-- Sanitizes request input and headers
+- Detects and blocks malicious payloads (the request is refused, its input is never rewritten)
+- Scans the query string, form input, headers and URL segments
 - Protects against XSS and injection attacks
 - Lightweight and efficient filtering
 
@@ -51,7 +51,7 @@ This widget acts as a central hub, allowing you to monitor and manage your appli
 | **Artisan** | `php artisan plugin:install Wobqqq.FortifyInputSanitizer` |
 | **Composer** | `composer require wobqqq/fortifyinputsanitizer-plugin` then `php artisan october:migrate` |
 
-It needs the [Fortify](https://octobercms.com/plugin/wobqqq-fortify) core plugin: Composer installs it with the module, from the marketplace install **Fortify** first.
+It needs the [Fortify](https://octobercms.com/plugin/wobqqq-fortify) core plugin: Composer installs it with the module; when installing from the marketplace, install **Fortify** first.
 
 ## 💻 Usage
 
@@ -69,6 +69,7 @@ php artisan wobqqq.fortify:input-sanitizer:disable
 
 ## ⬆️ Upgrading
 
+- **1.0.4** — installing the module with Composer installs the Fortify core with it. Nothing changes on an existing site.
 - **1.0.3** — a pattern that does not compile is refused when the settings are saved, and one already saved is skipped instead of failing every page of the site. A pattern that gives up on a long input (backtracking limit) lets the request through instead of breaking it. The settings are validated on every save and applied as soon as they are saved.
 
 ## ⚠️ Good to know
@@ -93,5 +94,5 @@ make test.coverage  # Pest with coverage (90 % minimum)
 make ready          # everything above
 ```
 
-Every pull request runs the same checks on GitHub Actions, plus a syntax check on PHP 8.2 and a run against the latest core. Pushing a tag that matches the last version in `updates/version.yaml` releases it to the October CMS marketplace once CI has passed.
+Every pull request runs the same checks on GitHub Actions, plus a syntax check on PHP 8.2 and a run against the latest core. Pushing a tag that matches the last version in `updates/version.yaml` publishes it as a GitHub release and to the October CMS marketplace once CI has passed.
 
