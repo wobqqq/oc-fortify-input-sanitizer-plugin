@@ -35,7 +35,8 @@ make ready          # all of the above
 | `http/middlewares/InputSanitizerMiddleware.php` | Runs the scan on every request of `cms.middleware_group` (the site, not the backend). |
 | `transformers/FortifyTransformer.php` | Turns the stored settings into `InputSanitizerDto`, keeping only the patterns that compile. |
 | `cache/, instances/` | The cached DTO (cleared on every settings save) and its per-request memo. |
-| `listeners/FortifyListener.php` | The settings form fields, their validation rules, the default patterns, the dashboard item, the cache clearing. |
+| `listeners/FortifyListener.php` | Wires the events to `SettingsService` and clears the module's cache when the settings are saved or deleted. |
+| `services/SettingsService.php` | The settings form fields, their validation rules, the default patterns, the dashboard item. |
 | `validator/rules/InputSanitizerRegexRule.php` | Refuses a pattern that does not compile when the settings are saved. |
 | `console/` | `disable`, the recovery path. |
 | `updates/version.yaml` | The version history the marketplace reads from `main`. |
@@ -45,6 +46,10 @@ make ready          # all of the above
 - The core is a separate plugin that sites update on their own schedule. Use only the core's public API (listed in the core's AGENTS.md: the `Fortify` settings model, `FortifyEvent`, `View`, `WidgetItemColor`, the widget DTOs and `FortifyTransformer::widget*Dto()`, `BasicCache::cacheKey()`/`TTL`). A new core API is used only behind a check (`method_exists`, `enum_exists`) with a fallback, so the module keeps working on every released core.
 - Settings are validated by rules the module adds to the core model. Add them in `Fortify::extend()` **and** when the settings form is built: the settings instance may exist before the module extends the model.
 - Caches are cleared on the `eloquent.saved` / `eloquent.deleted` events of the core model, never with `bindEvent()` on an instance, for the same reason.
+
+## Architecture
+
+Read the architecture skills before changing how the module is structured: `application-layer`, `dependency-injection`, `error-handling`, `validation`, `events`, `testing-architecture`, `domain-layer-cqrs` and `plugin-boundaries`. The listener only wires events: the settings section (defaults, rules, fields, the dashboard line) lives in `services/SettingsService.php`.
 
 ## Upgrading installed sites safely
 

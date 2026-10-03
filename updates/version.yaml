@@ -6,3 +6,5 @@ v1.0.3:
     - 'A pattern that does not compile is refused when the settings are saved and skipped instead of failing every request, a pattern that gives up on a long input no longer blocks it, and the settings are validated on every save and applied as soon as they are saved'
 v1.0.4:
     - 'Composer installs the Fortify core with the module; releases are published on GitHub'
+v1.0.5:
+    - 'Internal refactoring: the settings section moves from the listener to a service; settings and behaviour are unchanged'
