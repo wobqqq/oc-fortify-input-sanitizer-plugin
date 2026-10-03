@@ -57,8 +57,8 @@ jobs:
           UPDATE_URL: ${{ secrets.OCTOBER_MARKETPLACE_UPDATE_URL }}
         run: |
           if [ -z "$UPDATE_URL" ]; then
-            echo "::error::Add the plugin's Update URL from the marketplace as the OCTOBER_MARKETPLACE_UPDATE_URL secret"
-            exit 1
+            echo "::notice::No OCTOBER_MARKETPLACE_UPDATE_URL secret: the marketplace is not notified, so update the plugin from its marketplace page or add the secret."
+            exit 0
           fi
           curl --fail-with-body --silent --show-error --retry 3 --retry-all-errors --max-time 60 \
             --request POST --header 'Content-Type: application/json' \
