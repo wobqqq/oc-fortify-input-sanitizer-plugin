@@ -69,6 +69,7 @@ php artisan wobqqq.fortify:input-sanitizer:disable
 
 ## ⬆️ Upgrading
 
+- **1.0.5** — internal refactoring. Nothing changes on an existing site.
 - **1.0.4** — installing the module with Composer installs the Fortify core with it. Nothing changes on an existing site.
 - **1.0.3** — a pattern that does not compile is refused when the settings are saved, and one already saved is skipped instead of failing every page of the site. A pattern that gives up on a long input (backtracking limit) lets the request through instead of breaking it. The settings are validated on every save and applied as soon as they are saved.
 
