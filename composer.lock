@@ -154,16 +154,16 @@
         },
         {
             "name": "wobqqq/fortify-plugin",
-            "version": "v1.0.3",
+            "version": "v1.0.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/wobqqq/oc-fortify-plugin.git",
-                "reference": "52681bc7dfccf1b771fd2bd770e143aa772c54b2"
+                "reference": "6a90924bdfb9d80ef89fda008e2c45f6b63e586f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/wobqqq/oc-fortify-plugin/zipball/52681bc7dfccf1b771fd2bd770e143aa772c54b2",
-                "reference": "52681bc7dfccf1b771fd2bd770e143aa772c54b2",
+                "url": "https://api.github.com/repos/wobqqq/oc-fortify-plugin/zipball/6a90924bdfb9d80ef89fda008e2c45f6b63e586f",
+                "reference": "6a90924bdfb9d80ef89fda008e2c45f6b63e586f",
                 "shasum": ""
             },
             "require": {
@@ -197,21 +197,27 @@
                 }
             ],
             "description": "Security suite for October CMS: hardening checks, security scanners and a dashboard widget",
-            "homepage": "https://github.com/wobqqq/oc-fortify-plugin",
+            "homepage": "https://octobercms.com/plugin/wobqqq-fortify",
             "keywords": [
+                "firewall",
                 "fortify",
                 "hardening",
+                "laravel",
                 "october",
                 "october-plugin",
                 "octobercms",
-                "security"
+                "php",
+                "security",
+                "security-audit",
+                "vulnerability-scanner"
             ],
             "support": {
+                "docs": "https://github.com/wobqqq/oc-fortify-plugin#readme",
                 "issues": "https://github.com/wobqqq/oc-fortify-plugin/issues",
                 "security": "https://github.com/wobqqq/oc-fortify-plugin/security/policy",
                 "source": "https://github.com/wobqqq/oc-fortify-plugin"
             },
-            "time": "2026-09-30T19:24:11+00:00"
+            "time": "2026-09-30T20:03:03+00:00"
         }
     ],
     "packages-dev": [
